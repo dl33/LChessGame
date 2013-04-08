@@ -58,8 +58,8 @@ function isCurPlayerWin(clickedCell) {
 	// check the diagonal line
 	sum = 0;
 	
-	sum += checkBoardLine(0, game.board.boardLength, clickedCell.row, clickedCell.col, 3, curPlayerID);
-	sum += checkBoardLine(clickedCell.row, clickedCell.col, game.board.boardLength, 0, 3, curPlayerID);
+	sum += checkBoardLine(0, clickedCell.row, game.board.boardLength, clickedCell.col, 3, curPlayerID);
+	sum += checkBoardLine(clickedCell.row, game.board.boardLength, clickedCell.col, 0, 3, curPlayerID);
 	
 	alert("diagonal 2:" + sum);
 }
