@@ -14,7 +14,6 @@ function ChessGame(playersNum, boardLength) {
 ChessGame.prototype.startGame = function() {
 	this.initialBoader();
 	this.initialPlayer();
-	alert("Welcome to Tic Tac Toe!");
 };
 
 // initial players
@@ -45,6 +44,24 @@ ChessGame.prototype.restGame = function() {
 	this.startGame();
 };
 
+// restart a new game
+ChessGame.prototype.isDrawGame = function() {
+	if(this.board.maxCells == this.board.occupiedCell) {
+		return true;
+	} else {
+		return false;
+	}
+};
+
+ChessGame.prototype.playerPutChess = function(currentCell) {
+	if(this.players[this.curPlayerID].putChess(currentCell)) {
+		this.board.occupiedCell++;
+		return true;
+	} else {
+		return false;
+	}
+};
+
 /**
  * Game Menu Class
  */
@@ -57,10 +74,14 @@ function Menu() {
  */
 function Board(boardLength) {
 	this.boardLength = boardLength;
-	this.boardCells = new Array(this.boardLength);
+	this.maxCells = boardLength * boardLength;
 }
 
 Board.prototype.initial = function() {
+	this.occupiedCell = 0;
+	
+	this.boardCells = new Array(this.boardLength);
+	
 	for (var i = 0; i < this.boardCells.length; i++) {
 		this.boardCells[i] = new Array(this.boardLength);
 
