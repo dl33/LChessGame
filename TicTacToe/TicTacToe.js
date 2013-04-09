@@ -30,8 +30,8 @@ function initDisplay() {
 		for(var j = 0; j < MAX_BOARDLENGTH; j++) {
 			var $cellNode = new CellNode(i, j);
 			
-			$cellNode.css("top", i*110 + 10);
-			$cellNode.css("left", j*110 + 10);
+			$cellNode.css("top", i * 110 + 10);
+			$cellNode.css("left", j * 110 + 10);
 			$boardNode.append($cellNode);
 		}
 	}
@@ -128,8 +128,8 @@ function isCurPlayerWin(clickedCell) {
 	// check the horizontal line
 	sum = 0;
 	
-	sum += checkBoardLine(0, clickedCell.col, clickedCell.row, clickedCell.row, 1, curPlayerID);
-	sum += checkBoardLine(clickedCell.col, game.board.boardLength, clickedCell.row, clickedCell.row, 1, curPlayerID);
+	sum += checkBoardLine(clickedCell.row, clickedCell.row, 0, clickedCell.col, 1, curPlayerID);
+	sum += checkBoardLine(clickedCell.row, clickedCell.row, clickedCell.col, game.board.boardLength, 1, curPlayerID);
 	
 	if(isWin(sum)) {
 		return true;
@@ -177,7 +177,18 @@ function checkBoardLine(startRow, endRow, startCol, endCol, checkType, curPlayer
 	
 	if(checkType == 0 || checkType == 1) {
 		// Vertical(checkType:0) and Horizontal(checkType:1)
-		for(var i = startRow; i < endRow; i++) {
+		var startIndex = -1;
+		var endIndex = -1;
+		
+		if(checkType == 0) {
+			startIndex = startRow;
+			endIndex = endRow;	
+		} else {
+			startIndex = startCol;
+			endIndex = endCol;
+		}
+		
+		for(var i = startIndex; i < endIndex; i++) {
 			if(checkType == 0) {
 				// row cells
 				checkCell = game.board.boardCells[i][startCol];
