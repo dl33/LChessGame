@@ -81,6 +81,7 @@ function clickCell(cellNode) {
 				game.nextPlayer();
 			} else {
 				alert("Draw Game!");
+				restGame();
 			}
 		} else {
 			alert("Player " + game.curPlayerID + " win!");
@@ -148,7 +149,7 @@ function isCurPlayerWin(clickedCell) {
 	// check the diagonal(right to left) line
 	sum = 0;
 	
-	sum += checkBoardLine(0, clickedCell.row, game.board.boardLength, clickedCell.col, 3, curPlayerID);
+	sum += checkBoardLine(0, clickedCell.row, game.board.boardLength - 1, clickedCell.col, 3, curPlayerID);
 	sum += checkBoardLine(clickedCell.row, game.board.boardLength, clickedCell.col, 0, 3, curPlayerID);
 	
 	if(isWin(sum)) {
@@ -189,7 +190,7 @@ function checkBoardLine(startRow, endRow, startCol, endCol, checkType, curPlayer
 		}
 		
 		for(var i = startIndex; i < endIndex; i++) {
-			if(checkType == 0) {
+			if(0 == checkType) {
 				// row cells
 				checkCell = game.board.boardCells[i][startCol];
 			} else {
@@ -207,23 +208,35 @@ function checkBoardLine(startRow, endRow, startCol, endCol, checkType, curPlayer
 		var i = startRow;
 		var j = startCol;
 		
-		while(i < endRow && j < endCol) {
-			checkCell = game.board.boardCells[i][j];
-
-			// check whether the cell occupied by current player
-			if(checkCell.value == curPlayerID) {
-				sum += 1;
-			}
-
-			// move the cell down			
-			i++;
+		
+		if(2 == checkType) {
 			
-			// move the cell left or right
-			if(checkType == 2) {
-				// move to right
+			while(i < endRow && j < endCol) {
+				checkCell = game.board.boardCells[i][j];
+	
+				// check whether the cell occupied by current player
+				if(checkCell.value == curPlayerID) {
+					sum += 1;
+				}
+	
+				// move the cell to right down			
+				i++;
 				j++;
-			} else {
-				// move to left
+			}
+		} else {
+			var i = startRow;
+			var j = startCol;
+			
+			while(i < endRow && j >= endCol) {
+				checkCell = game.board.boardCells[i][j];
+	
+				// check whether the cell occupied by current player
+				if(checkCell.value == curPlayerID) {
+					sum += 1;
+				}
+	
+				// move the cell to left down			
+				i++;
 				j--;
 			}
 		}
