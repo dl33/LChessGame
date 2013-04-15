@@ -27,10 +27,14 @@ ChessGame.prototype.initialPlayer = function() {
 };
 
 ChessGame.prototype.nextPlayer = function() {
+	this.curPlayerID = getNextPlayerID;
+};
+
+ChessGame.prototype.getNextPlayerID = function() {
 	if((this.curPlayerID + 1) < this.playersNum) {
-		this.curPlayerID += 1;
+		return this.curPlayerID + 1;
 	} else {
-		this.curPlayerID = 0;
+		return 0;
 	}
 };
 
@@ -104,6 +108,14 @@ Cell.prototype.initial = function(row, col) {
 	this.row = row;
 	this.col = col;
 };
+
+Cell.prototype.isEmpty = function() {
+	if(this.value == -1) {
+		return true;
+	} else {
+		return false;
+	}
+}
 
 /**
  * Game Player Class

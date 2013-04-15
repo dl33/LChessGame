@@ -1,9 +1,0 @@
-@CHARSET "UTF-8";
-
-div .cells 
-{
-	position: absolute;
-	border: solid;
-	width: 100px;
-	height: 100px;
-}
