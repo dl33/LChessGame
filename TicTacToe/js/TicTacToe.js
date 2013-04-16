@@ -116,14 +116,14 @@ function getIndexFromCellID(cellID) {
 function isCurPlayerWin(clickedCell) {
 	var curPlayerID = game.curPlayerID;
 	
-	if(isPlayerWin(clickedCell, playerID) > 0) {
+	if(isPlayerWin(clickedCell, curPlayerID) > 0) {
 		return true;
 	} else {
 		return false;
 	}
 }
 
-function isPlayerWin(clickedCell, playerID) {
+function isPlayerWin(clickedCell, curPlayerID) {
 	// check the vertical line
 	var sum = 0;
 	
@@ -156,7 +156,7 @@ function checkVerticalLine(clickedCell, curPlayerID) {
 	sum += checkBoardLine(0, clickedCell.row, clickedCell.col, clickedCell.col, 0, curPlayerID);
 	sum += checkBoardLine(clickedCell.row, game.board.boardLength, clickedCell.col, clickedCell.col, 0, curPlayerID);
 	
-	return isWin(sum));
+	return isWin(sum);
 }
 
 function checkHorizontalLine(clickedCell, curPlayerID) {
@@ -165,7 +165,7 @@ function checkHorizontalLine(clickedCell, curPlayerID) {
 	sum += checkBoardLine(clickedCell.row, clickedCell.row, 0, clickedCell.col, 1, curPlayerID);
 	sum += checkBoardLine(clickedCell.row, clickedCell.row, clickedCell.col, game.board.boardLength, 1, curPlayerID);
 	
-	return isWin(sum));
+	return isWin(sum);
 }
 
 function checkDiagonalLine_LtoR(clickedCell, curPlayerID) {
@@ -174,7 +174,7 @@ function checkDiagonalLine_LtoR(clickedCell, curPlayerID) {
 	sum += checkBoardLine(0, clickedCell.row, 0, clickedCell.col, 2, curPlayerID);
 	sum += checkBoardLine(clickedCell.row, game.board.boardLength, clickedCell.col, game.board.boardLength, 2, curPlayerID);
 	
-	return isWin(sum));
+	return isWin(sum);
 }
 
 function checkDiagonalLine_RtoL(clickedCell, curPlayerID) {
@@ -183,7 +183,7 @@ function checkDiagonalLine_RtoL(clickedCell, curPlayerID) {
 	sum += checkBoardLine(0, clickedCell.row, game.board.boardLength - 1, clickedCell.col, 3, curPlayerID);
 	sum += checkBoardLine(clickedCell.row, game.board.boardLength, clickedCell.col, 0, 3, curPlayerID);
 	
-	return isWin(sum));
+	return isWin(sum);
 }
 
 /**
@@ -294,7 +294,7 @@ function miniMaxEvaluate() {
 	var count = 0;
 	
 	// copy the board to each player
-	for(var i==0; i < game.playersNum; i++) {
+	for(var i=0; i < game.playersNum; i++) {
 		$.extend(imitateBoard[i], game.board);	
 	}
 	
@@ -303,9 +303,9 @@ function miniMaxEvaluate() {
 	
 	for (var i = 0; i < imitateBoard[curPlayerID].boardCells.length; i++) {
 		for (var j = 0; j < imitateBoard[curPlayerID].boardCells[i].length; j++) {
-			count += = isPlayerWin(curPlayerID[curPlayerID].boardCells[i][j], curPlayerID);
+			count += isPlayerWin(curPlayerID[curPlayerID].boardCells[i][j], curPlayerID);
 			
-			if(isPlayerWin(imitateBoard[curPlayerID].boardCells[i][j], nextPlayerID > 0) {
+			if(isPlayerWin(imitateBoard[curPlayerID].boardCells[i][j], nextPlayerID) > 0) {
 				count -= 5;	
 			}
 		}
@@ -316,7 +316,7 @@ function miniMaxEvaluate() {
 	
 	for (var i = 0; i < imitateBoard[nextPlayer].boardCells.length; i++) {
 		for (var j = 0; j < imitateBoard[nextPlayer].boardCells[i].length; j++) {
-			if(isPlayerWin(imitateBoard[nextPlayer].boardCells[i][j], nextPlayerID) {
+			if(isPlayerWin(imitateBoard[nextPlayer].boardCells[i][j], nextPlayerID)) {
 				count -= 1;
 			}
 		}

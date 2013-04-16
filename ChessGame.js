@@ -27,7 +27,7 @@ ChessGame.prototype.initialPlayer = function() {
 };
 
 ChessGame.prototype.nextPlayer = function() {
-	this.curPlayerID = getNextPlayerID;
+	this.curPlayerID = this.getNextPlayerID();
 };
 
 ChessGame.prototype.getNextPlayerID = function() {
