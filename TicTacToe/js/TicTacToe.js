@@ -68,28 +68,38 @@ function clickCell(cellNode) {
 	// get clicked cell object by its tag id
 	var clickedCell = getIndexFromCellID(cellNode.id);
 	
-	// try to put a chess on clicked cell 
-	var isDone = game.playerPutChess(clickedCell);
-	
-	// if put a chess successfully
-	if(isDone) {
-		cellNode.innerHTML = clickedCell.value;
-		
-		// check whether current player win or not
-		if(!isCurPlayerWin(clickedCell)) {
-			if(!game.isDrawGame()) {
-				game.nextPlayer();
-			} else {
-				alert("Draw Game!");
-				restGame();
-			}
-		} else {
-			alert("Player " + game.curPlayerID + " win!");
-			restGame();
-		}
-	} else {
-		alert("Occupied: " + clickedCell.value);
-	}
+	putChess(clickedCell);
+}
+
+function putChess(clickedCell) {
+    // try to put a chess on clicked cell 
+    var isDone = game.playerPutChess(clickedCell);
+    
+    // if put a chess successfully
+    if(isDone) {
+        var $cellCode = $(clickedCell.row + clickCell.col + "");
+        $cellCode.innerHTML = game.curPlayerID; 
+        
+        // check whether current player win or not
+        if(!isCurPlayerWin(clickedCell)) {
+            if(!game.isDrawGame()) {
+                game.nextPlayer();
+                
+                if(game.curPlayerID == 1) {
+                    miniMaxEvaluate();
+                }
+                
+            } else {
+                alert("Draw Game!");
+                restGame();
+            }
+        } else {
+            alert("Player " + game.curPlayerID + " win!");
+            restGame();
+        }
+    } else {
+        alert("Occupied: " + clickedCell.value);
+    }
 }
 
 /**
@@ -291,38 +301,40 @@ function miniMaxEvaluate() {
 	var imitateBoard = new Array(game.playersNum);
 	var curPlayerID = game.curPlayerID;
 	var nextPlayerID = game.getNextPlayerID;
-	var count = 0;
+	var maxCount = 0;
+    var bestMove_row = -1;
+    var bestMove_col = -1;
 	
 	// copy the board to each player
 	for(var i=0; i < game.playersNum; i++) {
-		$.extend(imitateBoard[i], game.board);	
+		imitateBoard[i] = cloneObj(game.board);	
 	}
 	
-	// check current player's board
+	// check players' board
 	fillBoard(imitateBoard[curPlayerID], curPlayerID);
+	fillBoard(imitateBoard[nextPlayerID], nextPlayerID);
 	
 	for (var i = 0; i < imitateBoard[curPlayerID].boardCells.length; i++) {
 		for (var j = 0; j < imitateBoard[curPlayerID].boardCells[i].length; j++) {
-			count += isPlayerWin(curPlayerID[curPlayerID].boardCells[i][j], curPlayerID);
-			
+			var count = 0; 
+			count += isPlayerWin(imitateBoard[curPlayerID].boardCells[i][j], curPlayerID);
+            count += isPlayerWin(imitateBoard[nextPlayer].boardCells[i][j], nextPlayerID);
+            			
 			if(isPlayerWin(imitateBoard[curPlayerID].boardCells[i][j], nextPlayerID) > 0) {
-				count -= 5;	
+				count += 5;	
 			}
+			
+			if(count > maxCount) {
+			    maxCount = count;
+			    bestMove_row = i;
+			    bestMove_row = j;
+			}
+
 		}
 	}
-	
-	// check opponent player's baord
-	fillBoard(imitateBoard[nextPlayer], nextPlayerID);
-	
-	for (var i = 0; i < imitateBoard[nextPlayer].boardCells.length; i++) {
-		for (var j = 0; j < imitateBoard[nextPlayer].boardCells[i].length; j++) {
-			if(isPlayerWin(imitateBoard[nextPlayer].boardCells[i][j], nextPlayerID)) {
-				count -= 1;
-			}
-		}
-	}
-	
-	return count;
+
+    // put the ai chess
+	putChess(game.board.boardCells[row][col]);
 }
 
 function fillBoard(board, fillPlayerID) {
@@ -333,4 +345,37 @@ function fillBoard(board, fillPlayerID) {
 			}
 		}
 	}
+}
+
+function cloneObj(obj) {
+    // Handle the 3 simple types, and null or undefined
+    if (null == obj || "object" != typeof obj) return obj;
+
+    // Handle Date
+    if (obj instanceof Date) {
+        var copy = new Date();
+        copy.setTime(obj.getTime());
+        return copy;
+    }
+
+    // Handle Array
+    if (obj instanceof Array) {
+        var copy = [];
+        var len = obj.length;
+        for (var i = 0; i < len; ++i) {
+            copy[i] = cloneObj(obj[i]);
+        }
+        return copy;
+    }
+
+    // Handle Object
+    if (obj instanceof Object) {
+        var copy = {};
+        for (var attr in obj) {
+            if (obj.hasOwnProperty(attr)) copy[attr] = cloneObj(obj[attr]);
+        }
+        return copy;
+    }
+
+    throw new Error("Unable to copy obj! Its type isn't supported.");
 }
