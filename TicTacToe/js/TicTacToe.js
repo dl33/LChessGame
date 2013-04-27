@@ -77,8 +77,9 @@ function putChess(clickedCell) {
     
     // if put a chess successfully
     if(isDone) {
-        var $cellCode = $(clickedCell.row + clickCell.col + "");
+        var $cellCode = $(clickedCell.row + clickedCell.col + "");
         $cellCode.innerHTML = game.curPlayerID; 
+        $cellCode.addClass("user_cell");
         
         // check whether current player win or not
         if(!isCurPlayerWin(clickedCell)) {
@@ -86,7 +87,7 @@ function putChess(clickedCell) {
                 game.nextPlayer();
                 
                 if(game.curPlayerID == 1) {
-                    miniMaxEvaluate();
+                //    miniMaxEvaluate();
                 }
                 
             } else {
@@ -300,7 +301,7 @@ function isWin(sum) {
 function miniMaxEvaluate() {
 	var imitateBoard = new Array(game.playersNum);
 	var curPlayerID = game.curPlayerID;
-	var nextPlayerID = game.getNextPlayerID;
+	var nextPlayerID = game.getNextPlayerID();
 	var maxCount = 0;
     var bestMove_row = -1;
     var bestMove_col = -1;
@@ -316,32 +317,38 @@ function miniMaxEvaluate() {
 	
 	for (var i = 0; i < imitateBoard[curPlayerID].boardCells.length; i++) {
 		for (var j = 0; j < imitateBoard[curPlayerID].boardCells[i].length; j++) {
+			var curBoard = game.board;
 			var count = 0; 
+
+			game.board = imitateBoard[curPlayerID];
 			count += isPlayerWin(imitateBoard[curPlayerID].boardCells[i][j], curPlayerID);
-            count += isPlayerWin(imitateBoard[nextPlayer].boardCells[i][j], nextPlayerID);
-            			
+                        			
 			if(isPlayerWin(imitateBoard[curPlayerID].boardCells[i][j], nextPlayerID) > 0) {
 				count += 5;	
 			}
+
+			game.board = imitateBoard[nextPlayerID];
+			count += isPlayerWin(imitateBoard[nextPlayerID].boardCells[i][j], nextPlayerID);
 			
+			game.board = curBoard;
 			if(count > maxCount) {
 			    maxCount = count;
 			    bestMove_row = i;
-			    bestMove_row = j;
+			    bestMove_col = j;
 			}
 
 		}
 	}
 
     // put the ai chess
-	putChess(game.board.boardCells[row][col]);
+	putChess(game.board.boardCells[bestMove_row][bestMove_col]);
 }
 
 function fillBoard(board, fillPlayerID) {
 	for (var i = 0; i < board.boardCells.length; i++) {
 		for (var j = 0; j < board.boardCells[i].length; j++) {
-			if(board.boardCells[i][j].isEmpty) {
-				board.boardCells[i][j] = fillPlayerID;
+			if(board.boardCells[i][j].value == -1) {
+				board.boardCells[i][j].value = fillPlayerID;
 			}
 		}
 	}

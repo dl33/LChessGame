@@ -7,3 +7,8 @@ div .cells
 	width: 100px;
 	height: 100px;
 }
+
+div .user_cell 
+{
+	background-color: red;
+}
