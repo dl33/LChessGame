@@ -9,6 +9,11 @@ var PLAYER_NUMBERS = 2;
 var MAX_BOARDLENGTH = 3;  
 var WIN_CHESSNUM = 3;
 
+var CHECKTYPE_VERTICAL = 0;
+var CHECKTYPE_HORIZONTAL = 1;
+var CHECKTYPE_DIAGONAL_LtoR = 2;
+var CHECKTYPE_DIAGONAL_RtoL = 3;
+
 jQuery(document).ready(function() {
 	init();
 });
@@ -72,35 +77,33 @@ function clickCell(cellNode) {
 }
 
 function putChess(clickedCell) {
-    // try to put a chess on clicked cell 
-    var isDone = game.playerPutChess(clickedCell);
+	// try to put a chess on clicked cell 
+	var isDone = game.playerPutChess(clickedCell);
     
-    // if put a chess successfully
-    if(isDone) {
-        var $cellCode = $(clickedCell.row + clickedCell.col + "");
-        $cellCode.innerHTML = game.curPlayerID; 
-        $cellCode.addClass("user_cell");
+	// if put a chess successfully
+	if(isDone) {
+		var cellObj = document.getElementById(clickedCell.row.toString() + clickedCell.col.toString());
+		cellObj.innerHTML = game.curPlayerID;
         
-        // check whether current player win or not
-        if(!isCurPlayerWin(clickedCell)) {
-            if(!game.isDrawGame()) {
-                game.nextPlayer();
+		// check whether current player win or not
+		if(!isCurPlayerWin(clickedCell)) {
+			if(!game.isDrawGame()) {
+				game.nextPlayer();
                 
-                if(game.curPlayerID == 1) {
-                //    miniMaxEvaluate();
-                }
-                
-            } else {
-                alert("Draw Game!");
-                restGame();
-            }
-        } else {
-            alert("Player " + game.curPlayerID + " win!");
-            restGame();
-        }
-    } else {
-        alert("Occupied: " + clickedCell.value);
-    }
+				if(game.curPlayerID == 1) {
+					miniMaxEvaluate();
+				}
+			} else {
+				alert("Draw Game!");
+				restGame();
+			}
+		} else {
+			alert("Player " + game.curPlayerID + " win!");
+			restGame();
+		}
+	} else {
+		alert("Occupied: " + clickedCell.value);
+   	}
 }
 
 /**
@@ -110,10 +113,10 @@ function putChess(clickedCell) {
  */
 function getIndexFromCellID(cellID) {
 	// convey cell id to column index
-	var col = cellID.charAt(0).charCodeAt(0) - COL_ACSII_INDEX;
+	var col = cellID.charAt(1).charCodeAt(0) - COL_ACSII_INDEX;
 	
 	// convey cell id to row index
-	var row = cellID.charAt(1).charCodeAt(0) - ROW_ACSII_INDEX;
+	var row = cellID.charAt(0).charCodeAt(0) - ROW_ACSII_INDEX;
 
 	// return cell object
 	return game.board.boardCells[row][col];
@@ -164,8 +167,8 @@ function isPlayerWin(clickedCell, curPlayerID) {
 function checkVerticalLine(clickedCell, curPlayerID) {
 	var sum = 0;
 	
-	sum += checkBoardLine(0, clickedCell.row, clickedCell.col, clickedCell.col, 0, curPlayerID);
-	sum += checkBoardLine(clickedCell.row, game.board.boardLength, clickedCell.col, clickedCell.col, 0, curPlayerID);
+	sum += checkBoardLine(0, clickedCell.row, clickedCell.col, clickedCell.col, CHECKTYPE_VERTICAL, curPlayerID);
+	sum += checkBoardLine(clickedCell.row, game.board.boardLength, clickedCell.col, clickedCell.col, CHECKTYPE_VERTICAL, curPlayerID);
 	
 	return isWin(sum);
 }
@@ -173,8 +176,8 @@ function checkVerticalLine(clickedCell, curPlayerID) {
 function checkHorizontalLine(clickedCell, curPlayerID) {
 	var sum = 0;
 	
-	sum += checkBoardLine(clickedCell.row, clickedCell.row, 0, clickedCell.col, 1, curPlayerID);
-	sum += checkBoardLine(clickedCell.row, clickedCell.row, clickedCell.col, game.board.boardLength, 1, curPlayerID);
+	sum += checkBoardLine(clickedCell.row, clickedCell.row, 0, clickedCell.col, CHECKTYPE_HORIZONTAL, curPlayerID);
+	sum += checkBoardLine(clickedCell.row, clickedCell.row, clickedCell.col, game.board.boardLength, CHECKTYPE_HORIZONTAL, curPlayerID);
 	
 	return isWin(sum);
 }
@@ -182,8 +185,8 @@ function checkHorizontalLine(clickedCell, curPlayerID) {
 function checkDiagonalLine_LtoR(clickedCell, curPlayerID) {
 	var sum = 0;
 	
-	sum += checkBoardLine(0, clickedCell.row, 0, clickedCell.col, 2, curPlayerID);
-	sum += checkBoardLine(clickedCell.row, game.board.boardLength, clickedCell.col, game.board.boardLength, 2, curPlayerID);
+	sum += checkBoardLine(0, clickedCell.row, 0, clickedCell.col, CHECKTYPE_DIAGONAL_LtoR, curPlayerID);
+	sum += checkBoardLine(clickedCell.row, game.board.boardLength, clickedCell.col, game.board.boardLength, CHECKTYPE_DIAGONAL_LtoR, curPlayerID);
 	
 	return isWin(sum);
 }
@@ -191,8 +194,8 @@ function checkDiagonalLine_LtoR(clickedCell, curPlayerID) {
 function checkDiagonalLine_RtoL(clickedCell, curPlayerID) {
 	var sum = 0;
 	
-	sum += checkBoardLine(0, clickedCell.row, game.board.boardLength - 1, clickedCell.col, 3, curPlayerID);
-	sum += checkBoardLine(clickedCell.row, game.board.boardLength, clickedCell.col, 0, 3, curPlayerID);
+	sum += checkBoardLine(0, clickedCell.row, game.board.boardLength - 1, clickedCell.col, CHECKTYPE_DIAGONAL_RtoL, curPlayerID);
+	sum += checkBoardLine(clickedCell.row, game.board.boardLength, clickedCell.col, 0, CHECKTYPE_DIAGONAL_RtoL, curPlayerID);
 	
 	return isWin(sum);
 }
@@ -214,12 +217,12 @@ function checkBoardLine(startRow, endRow, startCol, endCol, checkType, curPlayer
 	var sum = 0;
 	var checkCell = null;
 	
-	if(checkType == 0 || checkType == 1) {
+	if(checkType == CHECKTYPE_VERTICAL || checkType == CHECKTYPE_HORIZONTAL) {
 		// Vertical(checkType:0) and Horizontal(checkType:1)
 		var startIndex = -1;
 		var endIndex = -1;
 		
-		if(checkType == 0) {
+		if(checkType == CHECKTYPE_VERTICAL) {
 			startIndex = startRow;
 			endIndex = endRow;	
 		} else {
@@ -228,7 +231,7 @@ function checkBoardLine(startRow, endRow, startCol, endCol, checkType, curPlayer
 		}
 		
 		for(var i = startIndex; i < endIndex; i++) {
-			if(0 == checkType) {
+			if(CHECKTYPE_VERTICAL == checkType) {
 				// row cells
 				checkCell = game.board.boardCells[i][startCol];
 			} else {
@@ -246,8 +249,7 @@ function checkBoardLine(startRow, endRow, startCol, endCol, checkType, curPlayer
 		var i = startRow;
 		var j = startCol;
 		
-		
-		if(2 == checkType) {
+		if(CHECKTYPE_DIAGONAL_LtoR == checkType) {
 			
 			while(i < endRow && j < endCol) {
 				checkCell = game.board.boardCells[i][j];
@@ -303,8 +305,8 @@ function miniMaxEvaluate() {
 	var curPlayerID = game.curPlayerID;
 	var nextPlayerID = game.getNextPlayerID();
 	var maxCount = 0;
-    var bestMove_row = -1;
-    var bestMove_col = -1;
+	var bestMove_row = -1;
+	var bestMove_col = -1;
 	
 	// copy the board to each player
 	for(var i=0; i < game.playersNum; i++) {
@@ -322,9 +324,14 @@ function miniMaxEvaluate() {
 
 			game.board = imitateBoard[curPlayerID];
 			count += isPlayerWin(imitateBoard[curPlayerID].boardCells[i][j], curPlayerID);
-                        			
-			if(isPlayerWin(imitateBoard[curPlayerID].boardCells[i][j], nextPlayerID) > 0) {
-				count += 5;	
+
+			if(game.board.boardCells[i][j].value == -1) {
+				var cellValue_temp = imitateBoard[curPlayerID].boardCells[i][j].value;
+				imitateBoard[curPlayerID].boardCells[i][j].value = nextPlayerID;
+				if(isPlayerWin(imitateBoard[curPlayerID].boardCells[i][j], nextPlayerID) > 0) {
+					count += 5;	
+				}
+				imitateBoard[curPlayerID].boardCells[i][j].value = cellValue_temp;
 			}
 
 			game.board = imitateBoard[nextPlayerID];
@@ -340,7 +347,7 @@ function miniMaxEvaluate() {
 		}
 	}
 
-    // put the ai chess
+	// put the ai chess
 	putChess(game.board.boardCells[bestMove_row][bestMove_col]);
 }
 
@@ -355,34 +362,34 @@ function fillBoard(board, fillPlayerID) {
 }
 
 function cloneObj(obj) {
-    // Handle the 3 simple types, and null or undefined
-    if (null == obj || "object" != typeof obj) return obj;
+	// Handle the 3 simple types, and null or undefined
+	if (null == obj || "object" != typeof obj) return obj;
 
-    // Handle Date
-    if (obj instanceof Date) {
-        var copy = new Date();
-        copy.setTime(obj.getTime());
-        return copy;
-    }
+	// Handle Date
+	if (obj instanceof Date) {
+		var copy = new Date();
+		copy.setTime(obj.getTime());
+		return copy;
+	}
 
-    // Handle Array
-    if (obj instanceof Array) {
-        var copy = [];
-        var len = obj.length;
-        for (var i = 0; i < len; ++i) {
-            copy[i] = cloneObj(obj[i]);
-        }
-        return copy;
-    }
+	// Handle Array
+	if (obj instanceof Array) {
+		var copy = [];
+		var len = obj.length;
+		for (var i = 0; i < len; ++i) {
+			copy[i] = cloneObj(obj[i]);
+		}
+		return copy;
+	}
 
-    // Handle Object
-    if (obj instanceof Object) {
-        var copy = {};
-        for (var attr in obj) {
-            if (obj.hasOwnProperty(attr)) copy[attr] = cloneObj(obj[attr]);
-        }
-        return copy;
-    }
+	// Handle Object
+	if (obj instanceof Object) {
+		var copy = {};
+		for (var attr in obj) {
+			if (obj.hasOwnProperty(attr)) copy[attr] = cloneObj(obj[attr]);
+		}
+		return copy;
+	}
 
-    throw new Error("Unable to copy obj! Its type isn't supported.");
+	throw new Error("Unable to copy obj! Its type isn't supported.");
 }
