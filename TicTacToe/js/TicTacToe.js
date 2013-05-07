@@ -325,25 +325,28 @@ function miniMaxEvaluate() {
 			game.board = imitateBoard[curPlayerID];
 			count += isPlayerWin(imitateBoard[curPlayerID].boardCells[i][j], curPlayerID);
 
-			if(game.board.boardCells[i][j].value == -1) {
-				var cellValue_temp = imitateBoard[curPlayerID].boardCells[i][j].value;
-				imitateBoard[curPlayerID].boardCells[i][j].value = nextPlayerID;
-				if(isPlayerWin(imitateBoard[curPlayerID].boardCells[i][j], nextPlayerID) > 0) {
-					count += 5;	
-				}
-				imitateBoard[curPlayerID].boardCells[i][j].value = cellValue_temp;
-			}
-
 			game.board = imitateBoard[nextPlayerID];
 			count += isPlayerWin(imitateBoard[nextPlayerID].boardCells[i][j], nextPlayerID);
-			
-			game.board = curBoard;
-			if(count > maxCount) {
-			    maxCount = count;
-			    bestMove_row = i;
-			    bestMove_col = j;
-			}
 
+			game.board = curBoard;
+			if(game.board.boardCells[i][j].value == -1) {
+				game.board.boardCells[i][j].value = nextPlayerID;
+				if(isPlayerWin(game.board.boardCells[i][j], nextPlayerID) > 0) {
+					count += 5;	
+				}
+
+				game.board.boardCells[i][j].value = curPlayerID;
+				if(isPlayerWin(game.board.boardCells[i][j], curPlayerID) > 0) {
+					count += 6;	
+				}
+				game.board.boardCells[i][j].value = -1;
+			}
+			
+			if(count > maxCount) {
+				maxCount = count;
+				bestMove_row = i;
+				bestMove_col = j;
+			}
 		}
 	}
 
